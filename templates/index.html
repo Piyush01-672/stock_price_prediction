@@ -1,72 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Trend Prediction</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .container {
-            max-width: 1200px;
-            margin-top: 50px;
-        }
-        .chart-container {
-            margin-top: 30px;
-        }
-        .table-responsive {
-            margin-top: 20px;
-        }
-        .download-link {
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stock Trend Prediction</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"/>
+
+  <style>
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+main.flex-fill {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+    html, body {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(to bottom right, #f4f6f8, #e0f7fa);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body > main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    body::after {
+    content: ' ';
+    background: blue;
+    display: block;
+    height: 10px;
+}
+
+    .navbar {
+      background-color: #1e3c72;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand,
+    .nav-link {
+      color: #ffffff !important;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      color: #ffd54f !important;
+    }
+
+    .section-header {
+      margin-top: 70px;
+      background: #e0f7fa;
+      padding: 40px 0;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #1e3c72;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin-top: 20px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      flex: 1;
+    }
+
+    .chart-container,
+    .table-responsive,
+    .download-link {
+      margin-top: 30px;
+    }
+
+    footer {
+      background-color: #1e3c72;
+      color: white;
+      padding: 60px 20px 30px;
+      flex-shrink: 0;
+      margin-top:0;
+
+    }
+
+    footer h5 {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    footer a {
+      color: #ffd54f;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .footer-grid > div {
+      flex: 1 1 200px;
+      min-width: 200px;
+    }
+
+    .social-icons a {
+      margin: 0 10px;
+      font-size: 20px;
+      color: #ffffff;
+    }
+
+    .social-icons a:hover {
+      color: #ffd54f;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(40px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .fadeIn {
+      animation: fadeInUp 1s ease-out;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1 class="text-center">Stock Trend Prediction</h1>
-        <form method="POST">
-            <div class="mb-3">
-                <label for="stock" class="form-label">Enter Stock Ticker:</label>
-                <input type="text" class="form-control" id="stock" name="stock" value="POWERGRID.NS">
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-        
-        {% if plot_path_ema_20_50 %}
-        <div class="chart-container">
-            <h3>Closing Price vs Time (20 & 50 Days EMA)</h3>
-            <img src="{{ url_for('static', filename='ema_20_50.png') }}" class="img-fluid" alt="EMA 20 & 50">
-        </div>
-        {% endif %}
-        
-        {% if plot_path_ema_100_200 %}
-        <div class="chart-container">
-            <h3>Closing Price vs Time (100 & 200 Days EMA)</h3>
-            <img src="{{ url_for('static', filename='ema_100_200.png') }}" class="img-fluid" alt="EMA 100 & 200">
-        </div>
-        {% endif %}
-        
-        {% if plot_path_prediction %}
-        <div class="chart-container">
-            <h3>Prediction vs Original Trend</h3>
-            <img src="{{ url_for('static', filename='stock_prediction.png') }}" class="img-fluid" alt="Prediction vs Original">
-        </div>
-        {% endif %}
-        
-        {% if data_desc %}
-        <div class="table-responsive">
-            <h3 class="mt-4">Descriptive Data from Jan 2000 to Nov 2024</h3>
-            {{ data_desc | safe }}
-        </div>
-        {% endif %}
-        
-        {% if dataset_link %}
-        <div class="download-link">
-            <a href="{{ url_for('download_file', filename=dataset_link.split('/')[-1]) }}" class="btn btn-success" download>Download Dataset (CSV)</a>
-        </div>
-        {% endif %}
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">StockPredictor</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#charts">Charts</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-fill">
+    <div class="section-header" id="home">
+      Stock Trend Prediction
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="container">
+            <h2 class="mt-4">Welcome to Stock Predictor</h2>
+    <p>This is a smart stock trend prediction system powered by AI and trained on historical market data to assist you in making informed decisions.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nec massa ut justo tempus dictum. Vestibulum a turpis id lorem bibendum tincidunt. Aenean sed turpis nec neque tempor pulvinar. Suspendisse potenti.</p>
+    <p>Nulla facilisi. Phasellus ut eros sed purus feugiat iaculis. Sed eu orci purus. Etiam eget sapien feugiat, dictum libero vel, dapibus elit.</p>
+
+      <form method="POST" onsubmit="handleSubmit()">
+  <div class="mb-3">
+    <label for="stock" class="form-label">Enter Stock Ticker:</label>
+    <input type="text" class="form-control" id="stock" name="stock" value="{{ request.form.stock or '' }}">
+  </div>
+  <div class="d-flex align-items-center gap-3">
+  <button type="submit" class="btn btn-primary" id="submitBtn">
+    Submit
+  </button>
+  <div id="loader" class="spinner-border text-primary ms-3" role="status" style="display: none;">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  </div>
+</form>
+
+<script>
+  function handleSubmit() {
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('loader').style.display = 'inline-block';
+  }
+</script>
+
+
+      {% if plot_path_ema_20_50 %}
+      <div class="chart-container">
+        <h3>Closing Price vs Time (20 & 50 Days EMA)</h3>
+        <img src="{{ url_for('static', filename='ema_20_50.png') }}" class="img-fluid" alt="EMA 20 & 50">
+      </div>
+      {% endif %}
+
+      {% if plot_path_ema_100_200 %}
+      <div class="chart-container">
+        <h3>Closing Price vs Time (100 & 200 Days EMA)</h3>
+        <img src="{{ url_for('static', filename='ema_100_200.png') }}" class="img-fluid" alt="EMA 100 & 200">
+      </div>
+      {% endif %}
+
+      {% if plot_path_prediction %}
+      <div class="chart-container">
+        <h3>Prediction vs Original Trend</h3>
+        <img src="{{ url_for('static', filename='stock_prediction.png') }}" class="img-fluid" alt="Prediction vs Original">
+      </div>
+      {% endif %}
+      {% if ai_summary %}
+  <div class="mt-5 p-4 border rounded bg-light shadow fadeIn">
+    <h4><i class="bi bi-robot"></i> AI Summary</h4>
+    <p>{{ ai_summary | safe }}</p>
+  </div>
+{% endif %}
+
+
+      {% if data_desc %}
+      <div class="table-responsive">
+        <h3 class="mt-4">Descriptive Data from Jan 2000 to Nov 2024</h3>
+        {{ data_desc | safe }}
+      </div>
+      {% endif %}
+
+      {% if dataset_link %}
+      <div class="download-link">
+        <a href="{{ url_for('download_file', filename=dataset_link.split('/')[-1]) }}" class="btn btn-success" download>
+          Download Dataset (CSV)
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <h5>About Us</h5>
+        <p>
+          We offer smart solutions for predicting stock trends using AI models trained on historical market data. Our system is designed to give insights for better decision-making.
+        </p>
+      </div>
+      <div>
+        <h5>Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Charts</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Contact Info</h5>
+        <p>
+          Email: support@stockpredictor.ai<br />
+          Phone: +91 9876543210<br />
+          Address: Delhi, India
+        </p>
+      </div>
+      <div>
+        <h5>Follow Us</h5>
+        <div class="social-icons">
+          <a href="#"><i class="bi bi-facebook"></i></a>
+          <a href="#"><i class="bi bi-twitter"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
+          <a href="#"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <p class="text-center mt-4 mb-0">&copy; 2025 StockPredictor. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
