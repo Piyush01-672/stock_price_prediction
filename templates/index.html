@@ -41,25 +41,49 @@ main.flex-fill {
     height: 10px;
 }
 
-    .navbar {
-      background-color: #1e3c72;
-      position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 1000;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ :root {
+      --light-bg: #f8f9fa;
+      --light-text: #212529;
+      --dark-bg: #121212;
+      --dark-text: #f8f9fa;
+      --brand-gradient: linear-gradient(90deg, #007cf0, #00dfd8);
     }
 
-    .navbar-brand,
-    .nav-link {
-      color: #ffffff !important;
+   
+
+    .navbar-custom {
+      background: var(--brand-gradient);
+      color: white;
+      transition: all 0.4s ease;
+    }
+
+    .navbar-custom .nav-link {
+      color: white !important;
       font-weight: 500;
+      margin: 0 10px;
     }
 
-    .nav-link:hover {
-      color: #ffd54f !important;
+    .navbar-custom .nav-link:hover {
+      color: #ffd700 !important;
     }
 
+    .toggle-theme-btn {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
     .section-header {
       margin-top: 70px;
       background: #e0f7fa;
@@ -150,50 +174,62 @@ main.flex-fill {
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">StockPredictor</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand fw-bold fs-4 text-white" href="#">📈 StockPredictor</a>
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav align-items-center">
           <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
           <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
           <li class="nav-item"><a class="nav-link" href="#charts">Charts</a></li>
-          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
+          <li class="nav-item ms-3">
+            
+          </li>
         </ul>
       </div>
     </div>
   </nav>
 
+
+
   <main class="flex-fill">
-    <div class="section-header" id="home">
-      Stock Trend Prediction
+   <section id="home" style="background: linear-gradient(to right, #e0f7fa, #e3f2fd); padding: 80px 0;">
+  <div class="container text-center">
+    <h1 class="display-4 fw-bold text-primary mb-4">📊 Stock Trend Prediction</h1>
+    <div class="bg-white p-5 rounded-4 shadow-sm">
+      <h2 class="fw-semibold mb-3">Welcome to <span style="color: #1e3c72;">Stock Predictor</span></h2>
+      <p class="text-muted">
+        This is a smart stock trend prediction system powered by AI and trained on historical market data to help you make informed investment decisions.
+      </p>
+      <p class="text-muted">
+        Whether you're a trader, investor, or analyst, our platform provides accurate stock forecasts, visual trends, and momentum analysis using EMA indicators.
+      </p>
+      <p class="text-muted">
+        With real-time predictions and downloadable insights, you’re equipped to stay ahead of the market.
+      </p>
     </div>
-
-    <div class="container">
-            <h2 class="mt-4">Welcome to Stock Predictor</h2>
-    <p>This is a smart stock trend prediction system powered by AI and trained on historical market data to assist you in making informed decisions.</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque nec massa ut justo tempus dictum. Vestibulum a turpis id lorem bibendum tincidunt. Aenean sed turpis nec neque tempor pulvinar. Suspendisse potenti.</p>
-    <p>Nulla facilisi. Phasellus ut eros sed purus feugiat iaculis. Sed eu orci purus. Etiam eget sapien feugiat, dictum libero vel, dapibus elit.</p>
-
-      <form method="POST" onsubmit="handleSubmit()">
-  <div class="mb-3">
+    <form method="POST" onsubmit="handleSubmit()">
+  <div class="mb-3 mt-5">
     <label for="stock" class="form-label">Enter Stock Ticker:</label>
     <input type="text" class="form-control" id="stock" name="stock" value="{{ request.form.stock or '' }}">
   </div>
-  <div class="d-flex align-items-center gap-3">
+  
+  <div style="display: flex; justify-content: center;">
   <button type="submit" class="btn btn-primary" id="submitBtn">
     Submit
   </button>
-  <div id="loader" class="spinner-border text-primary ms-3" role="status" style="display: none;">
+</div>
+  <div id="loader" class="spinner-border text-primary mt-2" role="status" style="display: none;">
     <span class="visually-hidden">Loading...</span>
   </div>
-  </div>
+  
 </form>
-
-<script>
+ <script>
   function handleSubmit() {
     document.getElementById('submitBtn').disabled = true;
     document.getElementById('loader').style.display = 'inline-block';
@@ -203,26 +239,26 @@ main.flex-fill {
 
       {% if plot_path_ema_20_50 %}
       <div class="chart-container">
-        <h3>Closing Price vs Time (20 & 50 Days EMA)</h3>
+        <h3></h3>
         <img src="{{ url_for('static', filename='ema_20_50.png') }}" class="img-fluid" alt="EMA 20 & 50">
       </div>
       {% endif %}
 
       {% if plot_path_ema_100_200 %}
       <div class="chart-container">
-        <h3>Closing Price vs Time (100 & 200 Days EMA)</h3>
+        <h3></h3>
         <img src="{{ url_for('static', filename='ema_100_200.png') }}" class="img-fluid" alt="EMA 100 & 200">
       </div>
       {% endif %}
 
       {% if plot_path_prediction %}
       <div class="chart-container">
-        <h3>Prediction vs Original Trend</h3>
+        <h3></h3>
         <img src="{{ url_for('static', filename='stock_prediction.png') }}" class="img-fluid" alt="Prediction vs Original">
       </div>
       {% endif %}
       {% if ai_summary %}
-  <div class="mt-5 p-4 border rounded bg-light shadow fadeIn">
+  <div class="mt-5 p-4 border rounded bg-light shadow fadeIn text-start">
     <h4><i class="bi bi-robot"></i> AI Summary</h4>
     <p>{{ ai_summary | safe }}</p>
   </div>
@@ -245,6 +281,13 @@ main.flex-fill {
       {% endif %}
     </div>
   </main>
+  </div>
+    
+</section>
+
+    
+
+
 
   <footer>
     <div class="footer-grid">

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact Us - StockPredictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"/>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #a2e2e7;
+    }
+
+    :root {
+      --light-bg: #f8f9fa;
+      --light-text: #212529;
+      --dark-bg: #121212;
+      --dark-text: #f8f9fa;
+      --brand-gradient: linear-gradient(90deg, #007cf0, #00dfd8);
+    }
+
+   
+
+    .navbar-custom {
+      background: var(--brand-gradient);
+      color: white;
+      transition: all 0.4s ease;
+    }
+
+    .navbar-custom .nav-link {
+      color: white !important;
+      font-weight: 500;
+      margin: 0 10px;
+    }
+
+    .navbar-custom .nav-link:hover {
+      color: #ffd700 !important;
+    }
+
+    .toggle-theme-btn {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-theme-btn:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .contact-form {
+      max-width: 800px;
+      margin: 80px auto 40px;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    footer {
+      background-color: #1e3c72;
+      color: white;
+      padding: 60px 40px 30px;
+      width: 100%;
+      margin-top: 50px;
+    }
+
+    footer h5 {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    footer a {
+      color: #ffd54f;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-grid > div {
+      flex: 1 1 220px;
+      min-width: 200px;
+      margin-left: -30px;
+    }
+
+    .social-icons a {
+      margin-right: 10px;
+      font-size: 20px;
+      color: #ffffff;
+    }
+
+    .social-icons a:hover {
+      color: #ffd54f;
+    }
+
+    .copyright {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+ <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand fw-bold fs-4 text-white" href="#">📈 StockPredictor</a>
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav align-items-center">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#charts">Charts</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
+          <li class="nav-item ms-3">
+            
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contact Form -->
+  <div class="contact-form">
+    <h2 class="text-center mb-4">📩 Contact Us</h2>
+    <p class="text-center">If you have any queries, feel free to reach out!</p>
+    <form method="POST" action="/contact">
+  <div class="mb-3">
+    <label for="name" class="form-label">Your Name</label>
+    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name">
+  </div>
+
+  <div class="mb-3">
+    <label for="email" class="form-label">Your Email</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email">
+  </div>
+
+  <div class="mb-3">
+    <label for="msg" class="form-label">Message</label>
+    <textarea class="form-control" id="msg" name="message" rows="4" placeholder="Write your message"></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Send</button>
+</form>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <h5>📊 About Us</h5>
+        <p>
+          We offer smart solutions for predicting stock trends using AI models trained on historical market data. Our system is designed to give insights for better decision-making.
+        </p>
+      </div>
+      <div>
+        <h5>🔗 Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="/">Home</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#charts">Charts</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>📞 Contact Info</h5>
+        <p>
+          ✉️ support@stockpredictor.ai<br />
+          📱 +91 9876543210<br />
+          📍 Delhi, India
+        </p>
+      </div>
+      <div>
+        <h5>🌐 Follow Us</h5>
+        <div class="social-icons">
+          <a href="#"><i class="bi bi-facebook"></i></a>
+          <a href="#"><i class="bi bi-twitter"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
+          <a href="#"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <p class="text-center mt-4 mb-0">&copy; 2025 StockPredictor. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
