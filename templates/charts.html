@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Features | StockPredictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+     body {
+      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      font-family: 'Segoe UI', sans-serif;
+    }
+      .chart-box {
+      border: 1px solid #dee2e6;
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 40px;
+      background-color: #ffffffcc;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    }
+    canvas {
+      margin-top: 20px;
+      width: 100% !important;
+    }
+.loader-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #ffffff;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+      overflow: hidden;
+    }
+
+    .loader-visual {
+      width: 160px;
+      height: 160px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #e0f7fa, #ffffff);
+      box-shadow: 0 0 25px rgba(0, 124, 240, 0.2);
+      padding: 10px;
+    }
+
+    .bar-chart {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 8px;
+      height: 80px;
+      position: absolute;
+    }
+
+    .bar-chart div {
+      width: 14px;
+      background: linear-gradient(180deg, #00dfd8, #007cf0);
+      border-radius: 4px;
+      animation: bounceBar 1s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(0, 124, 240, 0.3);
+    }
+
+    .bar-chart div:nth-child(1) { height: 60px; animation-delay: 0s; }
+    .bar-chart div:nth-child(2) { height: 45px; animation-delay: 0.2s; }
+    .bar-chart div:nth-child(3) { height: 70px; animation-delay: 0.4s; }
+
+    @keyframes bounceBar {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.5); }
+    }
+
+    .ticker-text {
+      font-size: 1.4rem;
+      color: #1e3c72;
+      margin-top: 30px;
+      animation: flicker 1.5s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    :root {
+      --light-bg: #f8f9fa;
+      --light-text: #212529;
+      --dark-bg: #121212;
+      --dark-text: #f8f9fa;
+      --brand-gradient: linear-gradient(90deg, #007cf0, #00dfd8);
+    }
+
+    body {
+      background-color: var(--light-bg);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .navbar-custom {
+      background: var(--brand-gradient);
+      color: white;
+    }
+
+    .navbar-custom .nav-link {
+      color: white !important;
+      font-weight: 500;
+      margin: 0 10px;
+      transition: 0.3s;
+    }
+
+    .navbar-custom .nav-link:hover {
+      color: #ffd700 !important;
+    }
+
+    .section-header {
+      margin-top: 70px;
+      background: #e0f7fa;
+      padding: 40px 0;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #1e3c72;
+      animation: fadeInUp 1s ease-out;
+    }
+
+   
+    footer {
+      background-color: #1e3c72;
+      color: white;
+      padding: 60px 20px 30px;
+      margin-top: 50px;
+    }
+
+    footer h5 {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    footer a {
+      color: #ffd54f;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .footer-grid > div {
+      flex: 1 1 200px;
+      min-width: 200px;
+    }
+
+    .social-icons a {
+      margin: 0 10px;
+      font-size: 20px;
+      color: #ffffff;
+    }
+
+    .social-icons a:hover {
+      color: #ffd54f;
+    }
+
+  </style>
+</head>
+<body>
+<body>
+   <div id="page-loader" class="loader-wrapper">
+    <div class="loader-visual">
+      <div class="bar-chart">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+    <div class="ticker-text">Loading...</div>
+  </div>
+
+  <script>
+    // Show loader for 1.8 seconds
+    setTimeout(() => {
+      const loader = document.getElementById('page-loader');
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 500);
+    }, 1800);
+  </script>
+
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand fw-bold fs-4 text-white" href="/">📈 StockPredictor</a>
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav align-items-center">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/features">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="/charts">Charts</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+ <!-- Header -->
+<div class="section-header">📉 Charts & Graphs</div>
+
+<!-- Body -->
+ <div class="container py-5">
+    <h2 class="text-center mb-5">📊 Stock Analytics – Chart Details</h2>
+
+    <div id="dailyReturnSection" class="chart-box">
+      <h4>📈 Daily Return Chart</h4>
+      <p>This section showcases daily percentage returns of a stock. You can observe days with high volatility and trends of increase or decrease over time. Useful for understanding risk levels and short-term performance swings.</p>
+      <canvas id="dailyChart"></canvas>
+    </div>
+
+    <div id="movingAvgSection" class="chart-box">
+      <h4>📉 Moving Averages</h4>
+      <p>Displays the moving averages like 10-day (short-term) and 50-day (medium-term) averages. These help in identifying trends:</p>
+      <canvas id="movingAvgChart"></canvas>
+    </div>
+
+    <div id="predictionSection" class="chart-box">
+      <h4>🔮 Predicted vs Actual</h4>
+      <p>Here we compare actual stock prices with the predicted values generated by our deep learning model.</p>
+      <canvas id="predictionChart"></canvas>
+    </div>
+  </div>
+
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <h5>About Us</h5>
+        <p>We offer smart solutions for predicting stock trends using AI models trained on historical market data.</p>
+      </div>
+      <div>
+        <h5>Quick Links</h5>
+        <ul class="list-unstyled">
+          <li><a href="/">Home</a></li>
+          <li><a href="/features">Features</a></li>
+          <li><a href="/charts">Charts</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Contact Info</h5>
+        <p>
+          Email: piyushsharma8280@gmail.com<br />
+          Phone: +91 7717453630<br />
+          Address: Punjab, India
+        </p>
+      </div>
+      <div>
+        <h5>Follow Us</h5>
+        <div class="social-icons">
+          <a href="#"><i class="bi bi-facebook"></i></a>
+          <a href="#"><i class="bi bi-twitter"></i></a>
+          <a href="#"><i class="bi bi-instagram"></i></a>
+          <a href="#"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <p class="text-center mt-4 mb-0">&copy; 2025 StockPredictor. All rights reserved.</p>
+  </footer>
+<script>
+
+  const MIN_LOADER_TIME = 1500;
+  const loader = document.getElementById('page-loader');
+  const startTime = performance.now();
+
+  window.addEventListener('load', () => {
+    const elapsed = performance.now() - startTime;
+    const remainingTime = MIN_LOADER_TIME - elapsed;
+
+    setTimeout(() => {
+      loader.style.display = 'none';
+    }, remainingTime > 0 ? remainingTime : 0);
+  });
+
+  // Show loader on normal link clicks
+  document.querySelectorAll('a').forEach(link => {
+    if (link.href && !link.href.startsWith('#') && !link.target) {
+      link.addEventListener('click', () => {
+        loader.style.display = 'flex';
+      });
+    }
+  });
+</script>
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    new Chart(document.getElementById("dailyChart"), {
+      type: "bar",
+      data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri"],
+        datasets: [{
+          label: "Daily Return (%)",
+          backgroundColor: ["#28a745", "#dc3545", "#28a745", "#dc3545", "#28a745"],
+          data: [1.2, -0.8, 0.6, -1.1, 2.4]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    new Chart(document.getElementById("movingAvgChart"), {
+      type: "line",
+      data: {
+        labels: ["Day 1", "2", "3", "4", "5", "6", "7"],
+        datasets: [
+          {
+            label: "10-day MA",
+            borderColor: "#007bff",
+            data: [102, 104, 106, 105, 107, 109, 111],
+            fill: false
+          },
+          {
+            label: "50-day MA",
+            borderColor: "#ffc107",
+            data: [100, 101, 102, 103, 104, 105, 106],
+            fill: false
+          }
+        ]
+      },
+      options: { responsive: true }
+    });
+
+    new Chart(document.getElementById("predictionChart"), {
+      type: "line",
+      data: {
+        labels: ["Day 1", "2", "3", "4", "5"],
+        datasets: [
+          {
+            label: "Actual",
+            borderColor: "#0d6efd",
+            data: [150, 152, 153, 155, 157],
+            fill: false
+          },
+          {
+            label: "Predicted",
+            borderColor: "#fd7e14",
+            data: [149, 151, 154, 156, 158],
+            fill: false
+          }
+        ]
+      },
+      options: { responsive: true }
+    });
+  </script>
+
+</body>
+</html>

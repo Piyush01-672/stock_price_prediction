@@ -8,18 +8,121 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"/>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
 
   <style>
+  .loader-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #ffffff;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+      overflow: hidden;
+    }
+
+    .loader-visual {
+      width: 160px;
+      height: 160px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #e0f7fa, #ffffff);
+      box-shadow: 0 0 25px rgba(0, 124, 240, 0.2);
+      padding: 10px;
+    }
+
+    .bar-chart {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 8px;
+      height: 80px;
+      position: absolute;
+    }
+
+    .bar-chart div {
+      width: 14px;
+      background: linear-gradient(180deg, #00dfd8, #007cf0);
+      border-radius: 4px;
+      animation: bounceBar 1s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(0, 124, 240, 0.3);
+    }
+
+    .bar-chart div:nth-child(1) { height: 60px; animation-delay: 0s; }
+    .bar-chart div:nth-child(2) { height: 45px; animation-delay: 0.2s; }
+    .bar-chart div:nth-child(3) { height: 70px; animation-delay: 0.4s; }
+
+    @keyframes bounceBar {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.5); }
+    }
+
+    .ticker-text {
+      font-size: 1.4rem;
+      color: #1e3c72;
+      margin-top: 30px;
+      animation: flicker 1.5s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
     * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-main.flex-fill {
-    flex: 1 0 auto;
-    display: flex;
-    flex-direction: column;
-}
+body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #f4f6f8, #e0f7fa);
+    }
+    .stylish-heading {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .glass-box {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    .feature-box {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 15px;
+      border: 1px solid #d1eaff;
+      box-shadow: 0 8px 20px rgba(0, 124, 240, 0.07);
+      transition: transform 0.3s ease;
+    }
+    .feature-box:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 10px 30px rgba(0, 124, 240, 0.2);
+    }
+    .text-brand {
+      color: #1e3c72;
+    }
+    .btn-gradient-primary {
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      border: none;
+      color: white;
+      transition: all 0.3s ease-in-out;
+    }
+    .btn-gradient-primary:hover {
+      background: linear-gradient(45deg, #00f2fe, #4facfe);
+      box-shadow: 0 5px 15px rgba(0, 242, 254, 0.3);
+    }
 
     html, body {
       height: 100%;
@@ -174,6 +277,28 @@ main.flex-fill {
 </head>
 
 <body>
+   <div id="page-loader" class="loader-wrapper">
+    <div class="loader-visual">
+      <div class="bar-chart">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+    <div class="ticker-text">Loading...</div>
+  </div>
+
+  <script>
+    // Show loader for 1.8 seconds
+    setTimeout(() => {
+      const loader = document.getElementById('page-loader');
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 500);
+    }, 1800);
+  </script>
+
+
+
     <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
     <div class="container-fluid px-4">
       <a class="navbar-brand fw-bold fs-4 text-white" href="#">📈 StockPredictor</a>
@@ -184,8 +309,8 @@ main.flex-fill {
       <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
         <ul class="navbar-nav align-items-center">
           <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
-          <li class="nav-item"><a class="nav-link" href="#charts">Charts</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('features') }}">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('charts') }}">Charts</a></li>
           <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
           <li class="nav-item ms-3">
             
@@ -195,49 +320,57 @@ main.flex-fill {
     </div>
   </nav>
 
+<main class="flex-fill">
+    <section id="home" style="background: linear-gradient(160deg, #e6f0ff, #fefeff); padding: 100px 0;">
+      <div class="container text-center">
+        <h1 class="display-2 fw-bold mb-2 stylish-heading">Stock Trend Prediction</h1>
+        <p class="lead text-muted mb-5">Smart insights powered by AI to help you make data-driven stock decisions.</p>
+        <div class="glass-box p-5 rounded-5 shadow-lg border">
+          <h2 class="fw-semibold mb-4 text-brand">Welcome to Stock Predictor</h2>
+          <p class="text-secondary fs-5 mb-3">
+            Unlock smart stock forecasts powered by Artificial Intelligence. Dive into deep insights and make informed market moves.
+          </p>
+          <div class="row justify-content-center mb-4">
+            <div class="col-md-10">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="feature-box">
+                    <h5>🔍 AI Analysis</h5>
+                    <p>Leverages LSTM models to detect stock trends.</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="feature-box">
+                    <h5>📊 EMA Strategy</h5>
+                    <p>Tracks moving averages for momentum insight.</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="feature-box">
+                    <h5>📥 Downloads</h5>
+                    <p>Export stock trend charts, summaries, and predictions in one click.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <form method="POST" class="mt-4" onsubmit="handleSubmit()">
+            <div class="mb-3">
+              <label for="stock" class="form-label fw-medium">Enter Stock Ticker:</label>
+              <input type="text" class="form-control form-control-lg rounded-pill shadow-sm w-50 mx-auto" id="stock" name="stock" placeholder="e.g., AAPL or MSFT" value="{{ request.form.stock or '' }}">
+            </div>
+            <button type="submit" class="btn btn-lg px-5 btn-gradient-primary rounded-pill" id="submitBtn">
+              🚀 Predict Now
+            </button>
+            <div class="mt-4 text-center">
+            <div id="loader" class="spinner-border text-primary mt-3" role="status" style="display: none;">
+              <span class="visually-hidden">Loading...</span>
+            </div>
 
-
-  <main class="flex-fill">
-   <section id="home" style="background: linear-gradient(to right, #e0f7fa, #e3f2fd); padding: 80px 0;">
-  <div class="container text-center">
-    <h1 class="display-4 fw-bold text-primary mb-4">📊 Stock Trend Prediction</h1>
-    <div class="bg-white p-5 rounded-4 shadow-sm">
-      <h2 class="fw-semibold mb-3">Welcome to <span style="color: #1e3c72;">Stock Predictor</span></h2>
-      <p class="text-muted">
-        This is a smart stock trend prediction system powered by AI and trained on historical market data to help you make informed investment decisions.
-      </p>
-      <p class="text-muted">
-        Whether you're a trader, investor, or analyst, our platform provides accurate stock forecasts, visual trends, and momentum analysis using EMA indicators.
-      </p>
-      <p class="text-muted">
-        With real-time predictions and downloadable insights, you’re equipped to stay ahead of the market.
-      </p>
-    </div>
-    <form method="POST" onsubmit="handleSubmit()">
-  <div class="mb-3 mt-5">
-    <label for="stock" class="form-label">Enter Stock Ticker:</label>
-    <input type="text" class="form-control" id="stock" name="stock" value="{{ request.form.stock or '' }}">
-  </div>
-  
-  <div style="display: flex; justify-content: center;">
-  <button type="submit" class="btn btn-primary" id="submitBtn">
-    Submit
-  </button>
-</div>
-  <div id="loader" class="spinner-border text-primary mt-2" role="status" style="display: none;">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-  
-</form>
- <script>
-  function handleSubmit() {
-    document.getElementById('submitBtn').disabled = true;
-    document.getElementById('loader').style.display = 'inline-block';
-  }
-</script>
-
-
-      {% if plot_path_ema_20_50 %}
+          </div>
+          </form>
+        </div>
+        {% if plot_path_ema_20_50 %}
       <div class="chart-container">
         <h3></h3>
         <img src="{{ url_for('static', filename='ema_20_50.png') }}" class="img-fluid" alt="EMA 20 & 50">
@@ -282,12 +415,20 @@ main.flex-fill {
     </div>
   </main>
   </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    function handleSubmit() {
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('loader').style.display = 'inline-block';
+    }
+  </script>
+
+
+      
     
 </section>
-
-    
-
-
 
   <footer>
     <div class="footer-grid">
@@ -309,9 +450,9 @@ main.flex-fill {
       <div>
         <h5>Contact Info</h5>
         <p>
-          Email: support@stockpredictor.ai<br />
-          Phone: +91 9876543210<br />
-          Address: Delhi, India
+          Email: piyushsharma8280@gmail.com<br />
+          Phone: +91 7717453630<br />
+          Address: Punjab, India
         </p>
       </div>
       <div>
@@ -328,5 +469,6 @@ main.flex-fill {
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

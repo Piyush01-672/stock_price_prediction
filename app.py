@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from keras.models import load_model
 from flask import Flask, render_template, request, send_file, redirect
@@ -15,6 +17,7 @@ app = Flask(__name__)
 
 # Load the model
 model = load_model('stock_dl_model.h5')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -34,8 +37,8 @@ def index():
         ema100 = df.Close.ewm(span=100, adjust=False).mean()
         ema200 = df.Close.ewm(span=200, adjust=False).mean()
 
-        data_training = pd.DataFrame(df['Close'][0:int(len(df)*0.70)])
-        data_testing = pd.DataFrame(df['Close'][int(len(df)*0.70): int(len(df))])
+        data_training = pd.DataFrame(df['Close'][0:int(len(df) * 0.70)])
+        data_testing = pd.DataFrame(df['Close'][int(len(df) * 0.70): int(len(df))])
 
         scaler = MinMaxScaler(feature_range=(0, 1))
         data_training_array = scaler.fit_transform(data_training)
@@ -55,6 +58,7 @@ def index():
         y_predicted = y_predicted * scale_factor
         y_test = y_test * scale_factor
 
+        # Charts
         fig1, ax1 = plt.subplots(figsize=(12, 6))
         ax1.plot(df.Close, 'y', label='Closing Price')
         ax1.plot(ema20, 'g', label='EMA 20')
@@ -96,6 +100,7 @@ def index():
         csv_file_path = f"static/{stock}_dataset.csv"
         df.to_csv(csv_file_path)
 
+        # AI Summary
         predicted_price = float(y_predicted[-1][0])
         actual_price = float(y_test[-1])
         price_change = predicted_price - actual_price
@@ -111,21 +116,15 @@ def index():
             except:
                 ema_trends.append("insufficient data")
 
-        if len(ema_trends) >= 2:
-            short_term_trend = (
-                "bullish momentum" if "falling" not in ema_trends[0] + ema_trends[1]
-                else "possible trend reversal"
-            )
-        else:
-            short_term_trend = "insufficient data for short-term trend"
+        short_term_trend = (
+            "bullish momentum" if "falling" not in ema_trends[0] + ema_trends[1]
+            else "possible trend reversal"
+        ) if len(ema_trends) >= 2 else "insufficient data"
 
-        if len(ema_trends) >= 4:
-            long_term_trend = (
-                "strong uptrend" if "falling" not in ema_trends[2] + ema_trends[3]
-                else "possible weakening of long-term trend"
-            )
-        else:
-            long_term_trend = "insufficient data for long-term trend"
+        long_term_trend = (
+            "strong uptrend" if "falling" not in ema_trends[2] + ema_trends[3]
+            else "possible weakening of long-term trend"
+        ) if len(ema_trends) >= 4 else "insufficient data"
 
         if len(y_test) > 10 and len(y_predicted) > 10:
             actual_trend = "upward 📈" if y_test[-1] > y_test[-10] else "downward 📉"
@@ -152,7 +151,7 @@ def index():
     return render_template('index.html')
 
 
-# ✅ Contact page route (with CSV saving)
+# ✅ Contact Page
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
@@ -172,13 +171,26 @@ def contact():
         return redirect('/contact')
 
     return render_template('contact.html')
-ontac
 
-# File download route
+
+# ✅ CSV Download Route
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_file(f"static/{filename}", as_attachment=True)
 
 
+# ✅ Features Page Route
+@app.route('/features')
+def features():
+    return render_template('features.html')
+
+
+# ✅ Charts Page Route
+@app.route('/charts')
+def charts():
+    return render_template('charts.html')
+
+
+# ✅ Run the App
 if __name__ == '__main__':
     app.run(debug=True)
